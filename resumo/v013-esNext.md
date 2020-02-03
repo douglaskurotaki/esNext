@@ -34,8 +34,49 @@ falarDepoisDe(3, 'Que lega!')
   .catch(e => console.log(e)) // trata erro quando for reject
   ```
 
-  O **then** retorna uma outra **primise**, por isso podemos **encadear**
+  O **then** retorna uma outra **promise**, por isso podemos **encadear**
 
   --- 
 
+# V014 - Usando Callbacks para Retorno de uma API
+
+Para iniciarmos, precisamos instânciar o módulo *http*
+`const http = require('http')`
+<br>
+Após isso, vamos criar a função:
+
+```js
+const getTurma = (letra, callback) => {
+  const url = `http://files.cod3r.com.br/curso-js/turma${letra}.json`
+  http.get(url, res => {
+    let resultado = ''
+    res.on('data', dados => { // Intercepta a resposta
+      resultado += dados // Recebe todas os dados na respota
+    })
+    res.on('end', () => {
+      callback(JSON.parse(resultado)) // Chama a funcao passada no parametro e faz o parse do JSON
+    })
+  })
+}
+```
+A intenção, dessa função, é passar no parâmetro uma letra identificador para concatenar na url com objetivo da **api** retornar um **JSON** com seus respectivos valores. Assim, com um segundo parâmetro esperando uma **callback**, conseguimos manipular os valores obtidos e tratar ela na chamada com o parâmetro criado.
+<br>
+Após ter criado a função, vamos criar a chamada da mesma
+
+```js
+let nomes = []
+getTurma('A', alunos => {
+  nomes = nomes.concat(alunos.map(a => `A: ${a.nome}`))
+  console.log(nomes)
+  getTurma('B', alunos => {
+    nomes = nomes.concat(alunos.map(a => `B: ${a.nome}`))
+    console.log(nomes)
+    getTurma('C', alunos => {
+      nomes = nomes.concat(alunos.map(a => `C: ${a.nome}`))
+      console.log(nomes)
+    })
+  })
+})
+```
+Aqui estamos chamando a função, passando a letra e a chamada callback
   
