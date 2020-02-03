@@ -79,4 +79,42 @@ getTurma('A', alunos => {
 })
 ```
 Aqui estamos chamando a função, passando a letra e a chamada callback
+
+--- 
+
+Agora, utilizando a **Promise**, a forma de construção fica mais fácil
+```js 
+const getTurma = letra => {
+  const url = `http://files.cod3r.com.br/curso-js/turma${letra}.json`
+  return new Promise((resolve, reject) => {
+    http.get(url, res => {
+      let resultado = ''
+
+      res.on('data', dados => { // Intercepta a resposta
+        resultado += dados // Recebe todas os dados na respota
+      })
+
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(resultado)) // Chama a funcao passada no parametro e faz o parse do JSON
+        } catch (e) {
+          reject(e)
+        }
+      })
+    })
+  })
+}
+```
+<br>
+
+Aqui nós inserimos o **Promise**, fazendo retornar algun valor do mesmo tipo. Dentro da função precisou inserir o **resolve** e o **reject**
+Na chamada, ficou mais simples. Nós chamamos o **Promise** para utilizar o método **all** que possibilita a chamada da função quantas vezes forem necessárias. Assim, ela espera o retorno de todos elas para conseguirmo tratar o mesmo. Os parâmetros, devem vir como array.
+
+```js
+Promise.all([getTurma('A'), getTurma('B'), getTurma('C')])
+  .then(turmas => [].concat(...turmas))
+  .then(alunos => alunos.map(aluno => aluno.nome))
+  .then(nomes => console.log(nomes))
+  .catch(e => console.log(e.message))
+```
   
